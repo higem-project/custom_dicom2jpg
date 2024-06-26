@@ -173,7 +173,7 @@ def _get_LUT_value_LINEAR_EXACT(data, window, level):
     return data
 
 
-def _ds_to_file(file_path, target_root, filetype, anonymous=None, patient_dict=None):
+def _ds_to_file(file_path, target_root, filetype, anonymous=None, patient_dict=None, counter=None, dataset=None):
     """
     The aim of this function is to help multiprocessing
     return True if OK
@@ -224,7 +224,7 @@ def _ds_to_file(file_path, target_root, filetype, anonymous=None, patient_dict=N
         pixel_array[:,:,[0,2]] = pixel_array[:,:,[2,0]]
     
     # get full export file path and file name (anonynmous files are pre-calculated and stored in patient_dict)
-    full_export_fp_fn = _get_export_file_path(ds, file_path, target_root, filetype, anonymous, patient_dict)
+    full_export_fp_fn = _get_export_file_path(ds, file_path, target_root, filetype, anonymous, patient_dict, counter, dataset)
     # make dir
     Path.mkdir(full_export_fp_fn.parent, exist_ok=True, parents=True)
     # write file
@@ -342,7 +342,7 @@ def _get_root_get_dicom_file_list(origin_input, target_root):
 
 
 
-def _get_export_file_path(ds, file_path, target_root, filetype, anonymous, patient_dict):
+def _get_export_file_path(ds, file_path, target_root, filetype, anonymous, patient_dict, counter, dataset):
     """construct export file path"""
 
     
@@ -365,7 +365,13 @@ def _get_export_file_path(ds, file_path, target_root, filetype, anonymous, patie
         # Full export file path
         # target_root/Today/PatientID_filetype/StudyDate_StudyTime_Modality_AccNum/Ser_Img.filetype
         today_str = time.strftime('%Y%m%d')
-        full_export_fp_fn = target_root/Path(today_str)/Path(f"{PatientID}_{filetype}")/Path(f"{StudyDate}_{StudyTime}_{Modality}_{AccessionNumber}")/Path(f"{SeriesNumber}_{InstanceNumber}.{filetype}")
+        if dataset:
+            if counter:
+                full_export_fp_fn = target_root/Path(f'{dataset}_Patient_{counter}')/Path(f"{PatientID}_{SeriesNumber}_{InstanceNumber}.{filetype}")
+            else:
+                full_export_fp_fn = target_root/Path(f"{PatientID}_{SeriesNumber}_{InstanceNumber}.{filetype}")
+        else:
+            full_export_fp_fn = target_root/Path(today_str)/Path(f"{PatientID}_{filetype}")/Path(f"{StudyDate}_{StudyTime}_{Modality}_{AccessionNumber}")/Path(f"{SeriesNumber}_{InstanceNumber}.{filetype}")
         
     # print(patient_dict)
     return full_export_fp_fn

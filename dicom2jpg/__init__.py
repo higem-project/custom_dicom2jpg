@@ -80,3 +80,12 @@ def dicom2bmp(origin, target_root=None, anonymous=False, multiprocessing=True):
     return _dicom_convertor(origin, target_root, filetype='bmp',
                             multiprocessing=multiprocessing, 
                             anonymous=anonymous)
+
+def dicom2png_cq500(origin, target_root=None, anonymous=False, multiprocessing=True, counter:int = None, dataset:str = None):
+
+    assert target_root, "You must pass a target_root for saving you converted files"  
+          
+    return _dicom_convertor(origin, target_root, filetype='png',
+                            multiprocessing=multiprocessing, 
+                            anonymous=anonymous, 
+                            counter=counter, dataset=dataset)
