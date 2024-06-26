@@ -237,7 +237,7 @@ def _ds_to_file(file_path, target_root, filetype, anonymous=None, patient_dict=N
     return True
 
 
-def _dicom_convertor(origin, target_root=None, filetype=None, anonymous=False, multiprocessing=True):
+def _dicom_convertor(origin, target_root=None, filetype=None, anonymous=False, multiprocessing=True, counter=None, dataset=None):
     """
     origin: can be a .dcm file or a folder
     target_root: root of output files and folders; default: root of origin file or folder
@@ -269,11 +269,11 @@ def _dicom_convertor(origin, target_root=None, filetype=None, anonymous=False, m
     # process image and export files
     if multiprocessing==True:     
         with concurrent.futures.ProcessPoolExecutor() as executor:
-            return_future = [executor.submit(_ds_to_file, file_path, target_root, filetype, anonymous, full_path_dict) 
+            return_future = [executor.submit(_ds_to_file, file_path, target_root, filetype, anonymous, full_path_dict, counter, dataset) 
                              for file_path in dicom_file_list]
             return_message = [future.result() for future in return_future]
     else:
-        return_message = [_ds_to_file(file_path, target_root, filetype, anonymous, full_path_dict) 
+        return_message = [_ds_to_file(file_path, target_root, filetype, anonymous, full_path_dict, counter, dataset) 
                           for file_path in dicom_file_list]
         
     # print out error message
