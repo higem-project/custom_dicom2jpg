@@ -1,3 +1,4 @@
+
 """
 dicom2jpg
 =========
@@ -13,6 +14,7 @@ Basic usage:
 """
 
 # import info
+
 from .__version__ import __title__, __description__, __url__, __version__
 from .__version__ import __author__, __author_email__, __license__
 
@@ -89,3 +91,11 @@ def dicom2png_cq500(origin, target_root=None, anonymous=False, multiprocessing=T
                             multiprocessing=multiprocessing, 
                             anonymous=anonymous, 
                             counter=counter, dataset=dataset)
+# import os
+# x = 0
+# for file in os.listdir('/Users/luizfelipe/Desktop/Python/Libraries/example_image'):
+#     if file.lower() != '.ds_store':
+#         x+=1   
+#         dicom2png_cq500('/Users/luizfelipe/Desktop/Python/Libraries/example_image', '/Users/luizfelipe/Desktop/Python/Libraries/converted',  multiprocessing=False, counter=x, dataset='cq500')
+#     else:
+#         continue
