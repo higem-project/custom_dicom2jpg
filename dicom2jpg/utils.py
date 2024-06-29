@@ -228,7 +228,6 @@ def _ds_to_file(file_path, target_root, filetype, anonymous=None, patient_dict=N
     # make dir
     if not os.path.exists(full_export_fp_fn.parent):
         os.makedirs(full_export_fp_fn.parent)
-    
     # write file
     if filetype=='jpg':
         image_quality = [int(cv2.IMWRITE_JPEG_QUALITY), 90]  # 70, 55
