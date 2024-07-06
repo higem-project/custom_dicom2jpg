@@ -173,7 +173,7 @@ def _get_LUT_value_LINEAR_EXACT(data, window, level):
     return data
 
 
-def _ds_to_file(file_path, target_root, filetype, anonymous=None, patient_dict=None, counter=None, dataset=None):
+def _ds_to_file(file_path, target_root, filetype, anonymous=None, patient_dict=None, counter=None, dataset=None, mosmed=False):
     """
     The aim of this function is to help multiprocessing
     return True if OK
@@ -183,6 +183,12 @@ def _ds_to_file(file_path, target_root, filetype, anonymous=None, patient_dict=N
     # read images and their pixel data
     # if anonymous is True -> precalculate patient_dict -> passed as patient dict 
     ds = pydicom.dcmread(file_path, force=True)
+    
+    # Check and add missing tags (be very careful with this)
+    if "SamplesPerPixel" not in ds:
+        ds.SamplesPerPixel = 1  # Example: Assume grayscale
+    if "PhotometricInterpretation" not in ds:
+        ds.PhotometricInterpretation = "MONOCHROME1"
     
     # to exclude unsupported SOP class by its UID
     is_unsupported = _is_unsupported(ds)
@@ -224,7 +230,7 @@ def _ds_to_file(file_path, target_root, filetype, anonymous=None, patient_dict=N
         pixel_array[:,:,[0,2]] = pixel_array[:,:,[2,0]]
     
     # get full export file path and file name (anonynmous files are pre-calculated and stored in patient_dict)
-    full_export_fp_fn = _get_export_file_path(ds, file_path, target_root, filetype, anonymous, patient_dict, counter, dataset)
+    full_export_fp_fn = _get_export_file_path(ds, file_path, target_root, filetype, anonymous, patient_dict, counter, dataset, mosmed)
     # make dir
     if not os.path.exists(full_export_fp_fn.parent):
         os.makedirs(full_export_fp_fn.parent)
@@ -238,7 +244,7 @@ def _ds_to_file(file_path, target_root, filetype, anonymous=None, patient_dict=N
     return True
 
 
-def _dicom_convertor(origin, target_root=None, filetype=None, anonymous=False, multiprocessing=True, counter=None, dataset=None):
+def _dicom_convertor(origin, target_root=None, filetype=None, anonymous=False, multiprocessing=True, counter=None, dataset=None, mosmed=False):
     """
     origin: can be a .dcm file or a folder
     target_root: root of output files and folders; default: root of origin file or folder
@@ -270,11 +276,11 @@ def _dicom_convertor(origin, target_root=None, filetype=None, anonymous=False, m
     # process image and export files
     if multiprocessing==True:     
         with concurrent.futures.ProcessPoolExecutor() as executor:
-            return_future = [executor.submit(_ds_to_file, file_path, target_root, filetype, anonymous, full_path_dict, counter, dataset) 
+            return_future = [executor.submit(_ds_to_file, file_path, target_root, filetype, anonymous, full_path_dict, counter, dataset, mosmed) 
                              for file_path in dicom_file_list]
             return_message = [future.result() for future in return_future]
     else:
-        return_message = [_ds_to_file(file_path, target_root, filetype, anonymous, full_path_dict, counter, dataset) 
+        return_message = [_ds_to_file(file_path, target_root, filetype, anonymous, full_path_dict, counter, dataset, mosmed) 
                           for file_path in dicom_file_list]
         
     # print out error message
@@ -343,7 +349,7 @@ def _get_root_get_dicom_file_list(origin_input, target_root):
 
 
 
-def _get_export_file_path(ds, file_path, target_root, filetype, anonymous, patient_dict, counter, dataset):
+def _get_export_file_path(ds, file_path, target_root, filetype, anonymous, patient_dict, counter, dataset, mosmed):
     """construct export file path"""
 
     
@@ -367,10 +373,18 @@ def _get_export_file_path(ds, file_path, target_root, filetype, anonymous, patie
         # target_root/Today/PatientID_filetype/StudyDate_StudyTime_Modality_AccNum/Ser_Img.filetype
         today_str = time.strftime('%Y%m%d')
         if dataset:
+            
             if counter:
-                full_export_fp_fn = target_root/Path(f'{dataset}_Patient_{counter}')/Path(f"{PatientID}_{SeriesNumber}_{InstanceNumber}.{filetype}")
+                if mosmed: 
+                    full_export_fp_fn = target_root/Path(f'{dataset}_Patient_{counter}')/Path(f"{dataset}_{SeriesNumber}_{InstanceNumber}.{filetype}")
+                else:
+                    full_export_fp_fn = target_root/Path(f'{dataset}_Patient_{counter}')/Path(f"{PatientID}_{SeriesNumber}_{InstanceNumber}.{filetype}")
+                    
             else:
-                full_export_fp_fn = target_root/Path(f"{PatientID}_{SeriesNumber}_{InstanceNumber}.{filetype}")
+                if mosmed: 
+                    full_export_fp_fn = target_root/Path(f"{dataset}_{SeriesNumber}_{InstanceNumber}.{filetype}")
+                else:
+                    full_export_fp_fn = target_root/Path(f"{PatientID}_{SeriesNumber}_{InstanceNumber}.{filetype}")
         else:
             full_export_fp_fn = target_root/Path(today_str)/Path(f"{PatientID}_{filetype}")/Path(f"{StudyDate}_{StudyTime}_{Modality}_{AccessionNumber}")/Path(f"{SeriesNumber}_{InstanceNumber}.{filetype}")
         

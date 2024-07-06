@@ -91,6 +91,15 @@ def dicom2png_cq500(origin, target_root=None, anonymous=False, multiprocessing=T
                             multiprocessing=multiprocessing, 
                             anonymous=anonymous, 
                             counter=counter, dataset=dataset)
+
+def dicom2png_mosmed(origin, target_root=None, anonymous=False, multiprocessing=True, counter:int = None, dataset:str = None, mosmed=True):
+
+    assert target_root, "You must pass a target_root for saving you converted files"  
+          
+    return _dicom_convertor(origin, target_root, filetype='png',
+                            multiprocessing=multiprocessing, 
+                            anonymous=anonymous, 
+                            counter=counter, dataset=dataset, mosmed=mosmed)
 # import os
 # x = 0
 # for file in os.listdir('/Users/luizfelipe/Desktop/Python/Libraries/example_image'):
