@@ -121,8 +121,7 @@ def _pixel_process(ds, pixel_array):
     # Presentation VOI
     # normalize to 8 bit
     pixel_array = ((pixel_array-pixel_array.min())/(pixel_array.max()-pixel_array.min())) * 255.0
-    pixel_array[pixel_array > 255] = 255 
-    pixel_array[pixel_array < 0] = 0
+    pixel_array = np.clip(pixel_array, 0, 255) 
     
     # if PhotometricInterpretation == "MONOCHROME1", then inverse; eg. xrays
     if 'PhotometricInterpretation' in ds and ds.PhotometricInterpretation == "MONOCHROME1":
