@@ -188,7 +188,7 @@ def _ds_to_file(file_path, target_root, filetype, anonymous=None, patient_dict=N
     if "SamplesPerPixel" not in ds:
         ds.SamplesPerPixel = 1  # Example: Assume grayscale
     if "PhotometricInterpretation" not in ds:
-        ds.PhotometricInterpretation = "MONOCHROME1"
+        ds.PhotometricInterpretation = "MONOCHROME2"
     
     # to exclude unsupported SOP class by its UID
     is_unsupported = _is_unsupported(ds)
