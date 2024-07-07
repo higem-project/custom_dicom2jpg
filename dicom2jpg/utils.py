@@ -245,8 +245,8 @@ def _ds_to_file(file_path, target_root, filetype, anonymous=None, patient_dict=N
     # get full export file path and file name (anonynmous files are pre-calculated and stored in patient_dict)
     full_export_fp_fn = _get_export_file_path(ds, file_path, target_root, filetype, anonymous, patient_dict, counter, dataset, mosmed)
     # make dir
-    if not os.path.exists(full_export_fp_fn.parent):
-        os.makedirs(full_export_fp_fn.parent, exist_ok=True)
+    if not os.path.exists(Path(full_export_fp_fn).parent):
+        os.makedirs(Path(full_export_fp_fn).parent, exist_ok=True)
     # write file
     if filetype=='jpg':
         image_quality = [int(cv2.IMWRITE_JPEG_QUALITY), 90]  # 70, 55
