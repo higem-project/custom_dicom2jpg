@@ -391,13 +391,13 @@ def _get_export_file_path(ds, file_path, target_root, filetype, anonymous, patie
                 if mosmed: 
                     full_export_fp_fn = target_root/Path(f'{dataset}_Patient_{counter}')/Path(f"{dataset}_{SeriesNumber}_{InstanceNumber}.{filetype}")
                 else:
-                    full_export_fp_fn = target_root/Path(f'{dataset}_Patient_{counter}')/Path(f"{PatientID}_{SeriesNumber}_{InstanceNumber}.{filetype}")
+                    full_export_fp_fn = target_root/Path(f'{dataset}_Patient_{PatientID}')/Path(f"{PatientID}_{SeriesNumber}_{InstanceNumber}.{filetype}")
                     
             else:
                 if mosmed: 
                     full_export_fp_fn = target_root/Path(f"{dataset}_{SeriesNumber}_{InstanceNumber}.{filetype}")
                 else:
-                    full_export_fp_fn = target_root/Path(f'{dataset}_{SeriesNumber}')/Path(f"{PatientID}_{SeriesNumber}_{InstanceNumber}.{filetype}")
+                    full_export_fp_fn = target_root/Path(f'{dataset}_{PatientID}')/Path(f"{PatientID}_{SeriesNumber}_{InstanceNumber}.{filetype}")
         else:
             full_export_fp_fn = target_root/Path(today_str)/Path(f"{PatientID}_{filetype}")/Path(f"{StudyDate}_{StudyTime}_{Modality}_{AccessionNumber}")/Path(f"{SeriesNumber}_{InstanceNumber}.{filetype}")
         
